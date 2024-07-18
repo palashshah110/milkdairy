@@ -8,8 +8,10 @@ import {
 } from "@mui/material";
 import Autocomplete from '@mui/material/Autocomplete';
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 const AddMilkInward = () => {
+  const navigate  = useNavigate();
 
   const Users = [
     { label: "Rohan Das" },
@@ -87,7 +89,7 @@ const AddMilkInward = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" fullWidth>
+              <Button variant="contained" color="primary" fullWidth onClick={()=>navigate('/MilkOutward')}>
                 Submit
               </Button>
             </Grid>

@@ -5,6 +5,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Autocomplete from '@mui/material/Autocomplete';
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 const AddMilkOutward = () => {
 
@@ -17,7 +18,7 @@ const AddMilkOutward = () => {
     { label: "Mithilesh Rajput" },
     { label: "Pritesh Mishra" },
   ];
-
+  const navigate = useNavigate();
 
   return (
     <>
@@ -64,7 +65,7 @@ const AddMilkOutward = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" fullWidth>
+              <Button variant="contained" color="primary" fullWidth onClick={()=>navigate('/MilkOutward')}>
                 Submit
               </Button>
             </Grid>
