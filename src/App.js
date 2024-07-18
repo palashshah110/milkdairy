@@ -5,6 +5,8 @@ import Users from "./Componets/Users";
 import Login from "./Componets/Login";
 import MilkInward from "./Componets/MilkInward";
 import MilkOutward from "./Componets/MilkOutward";
+import AddMilkOutward from "./Componets/AddMilkOutward";
+import AddMilkInward from "./Componets/AddMilkInward";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
             <Route path="/Users" element={<Users />} />
             <Route path="/MilkInward" element={<MilkInward />} />
             <Route path="/MilkOutward" element={<MilkOutward />} />
+            <Route path="/AddMilkOutward" element={<AddMilkOutward />} />
+            <Route path="/AddMilkInward" element={<AddMilkInward />} />
           </Routes>
         </BrowserRouter>
       </Box>

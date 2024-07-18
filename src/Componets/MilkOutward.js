@@ -7,8 +7,11 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 export default function MilkOutward() {
+
+  const navigate = useNavigate()
 
   const Data = [
     { id: 1, dates: "16-07-2024", fullName: "Rajesh", morning: "2", evening: "3" },
@@ -23,6 +26,10 @@ export default function MilkOutward() {
     { field: 'morning', headerName: 'Morning (in Litre)', flex: 1 },
     { field: 'evening', headerName: 'Evening (in Litre)', flex: 1 },
   ];
+
+  function handleAddButton() {
+    navigate('/AddMilkOutward')
+  }
 
   return (
     <>
@@ -44,7 +51,7 @@ export default function MilkOutward() {
           >
             Milk Outward
           </Box>
-          <Button variant="outlined">
+          <Button onClick={handleAddButton} variant="outlined">
             Add
           </Button>
         </Box>

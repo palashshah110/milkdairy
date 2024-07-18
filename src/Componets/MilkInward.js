@@ -10,9 +10,13 @@ import {
   FormControl,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 export default function MilkInward() {
+
+  const navigate = useNavigate()
+
   const initialData = [
     {
       id: 1,
@@ -89,6 +93,10 @@ export default function MilkInward() {
     }
   };
 
+  function handleAddInward() {
+    navigate('/AddMilkInward')
+  }
+
   const columns = [
     { field: "fullName", headerName: "Full Name", flex: 1 },
     { field: "fat", headerName: "Fat", flex: 1 },
@@ -123,7 +131,7 @@ export default function MilkInward() {
           >
             Milk Inward
           </Box>
-          <Button variant="outlined">Add</Button>
+          <Button onClick={handleAddInward} variant="outlined">Add</Button>
         </Box>
         <Box mb={2}>
           <Typography>Date: 18/07/2024</Typography>
