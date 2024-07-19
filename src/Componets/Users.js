@@ -1,103 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Toolbar, Typography, Paper } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
+import axios from 'axios'
 
 export default function Users() {
-  const rows = [
-    {
-      id: 1,
-      username: "Rajesh Kumar",
-      email: "rajesh.kumar@example.com",
-      password: "******",
-    },
-    {
-      id: 2,
-      username: "Priya Sharma",
-      email: "priya.sharma@example.com",
-      password: "******",
-    },
-    {
-      id: 3,
-      username: "Amit Verma",
-      email: "amit.verma@example.com",
-      password: "******",
-    },
-    {
-      id: 4,
-      username: "Sonal Patel",
-      email: "sonal.patel@example.com",
-      password: "******",
-    },
-    {
-      id: 5,
-      username: "Vikram Singh",
-      email: "vikram.singh@example.com",
-      password: "******",
-    },
-    {
-      id: 6,
-      username: "Neha Gupta",
-      email: "neha.gupta@example.com",
-      password: "******",
-    },
-    {
-      id: 7,
-      username: "Anil Joshi",
-      email: "anil.joshi@example.com",
-      password: "******",
-    },
-    {
-      id: 8,
-      username: "Pooja Mehta",
-      email: "pooja.mehta@example.com",
-      password: "******",
-    },
-    {
-      id: 9,
-      username: "Suresh Rao",
-      email: "suresh.rao@example.com",
-      password: "******",
-    },
-    {
-      id: 10,
-      username: "Kavita Nair",
-      email: "kavita.nair@example.com",
-      password: "******",
-    },
-    {
-      id: 11,
-      username: "Rohan Desai",
-      email: "rohan.desai@example.com",
-      password: "******",
-    },
-    {
-      id: 12,
-      username: "Anjali Iyer",
-      email: "anjali.iyer@example.com",
-      password: "******",
-    },
-    {
-      id: 13,
-      username: "Mukesh Yadav",
-      email: "mukesh.yadav@example.com",
-      password: "******",
-    },
-    {
-      id: 14,
-      username: "Sneha Reddy",
-      email: "sneha.reddy@example.com",
-      password: "******",
-    },
-    {
-      id: 15,
-      username: "Arjun Choudhary",
-      email: "arjun.choudhary@example.com",
-      password: "******",
-    },
-  ];
-  
 
+  const [row, setRow] = useState([])
+
+  async function getData() {
+    try {
+      const response = await axios.get('http://localhost:4000/Users')
+      const data = response.data.map((item,index) => ({
+        id: index + 1,
+        fullName:item.fullName,
+        email: item.email,
+        password: item.password
+      }))
+      setRow(data)
+    } catch (error) {
+      console.error("Error while fetching:",error)
+    }   
+  }
+  
+  useEffect(() => {
+    getData()
+  },[])
+  
   const columns = [
     {
       field: "id",
@@ -107,7 +36,7 @@ export default function Users() {
       align: "center",
     },
     {
-      field: "username",
+      field: "fullName",
       headerName: "Full Name",
       flex: 2,
       headerAlign: "center",
@@ -145,7 +74,7 @@ export default function Users() {
         </Typography>
         <Paper sx={{ marginTop: "20px", height: "75vh", width: "100%" }}>
           <DataGrid
-            rows={rows || []}
+            rows={row || []}
             columns={columns}
             pageSize={10}
             rowsPerPageOptions={[10, 25, 50]}
