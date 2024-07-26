@@ -16,32 +16,26 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import FaceIcon from "@mui/icons-material/Face";
 
-
-
 export default function Sidebar() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(true);
 
   const Logout = () => {
-    navigate('/')
-  }
+    navigate("/");
+  };
   return (
     <>
-
-
       <IconButton
-
         color="inherit"
         aria-label="open drawer"
         onClick={() => setOpen(!open)}
         edge="start"
         sx={{
-          mr: 2
-         }}
+          mr: 2,
+        }}
       >
         <MenuIcon />
       </IconButton>
-
 
       <Drawer
         variant="temporary"
@@ -55,8 +49,6 @@ export default function Sidebar() {
       >
         <Toolbar />
 
-
-        
         <Box sx={{ overflow: "auto" }}>
           <List>
             <ListItem sx={{ height: 130, flexDirection: "column" }}>
@@ -75,7 +67,7 @@ export default function Sidebar() {
             </ListItem>
 
             <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/Users')}>
+              <ListItemButton onClick={() => navigate("/Users")}>
                 <ListItemIcon>
                   <FaceIcon sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
@@ -84,32 +76,32 @@ export default function Sidebar() {
             </ListItem>
 
             <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/MilkOutward')}>
+              <ListItemButton onClick={() => navigate("/MilkOutward")}>
                 <ListItemIcon>
                   <FaceIcon sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
-                <ListItemText sx={{ fontSize: "14px" }} primary="Milk Outward" />
+                <ListItemText
+                  sx={{ fontSize: "14px" }}
+                  primary="Milk Outward"
+                />
               </ListItemButton>
             </ListItem>
 
             <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/MilkInward')}>
+              <ListItemButton onClick={() => navigate("/MilkInward")}>
                 <ListItemIcon>
                   <FaceIcon sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: "14px" }} primary="Milk Inward" />
               </ListItemButton>
             </ListItem>
-            
+
             <ListItem disablePadding>
               <ListItemButton onClick={Logout}>
                 <ListItemIcon>
                   <ApartmentIcon sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
-                <ListItemText
-                  sx={{ fontSize: "14px" }}
-                  primary="Logout"
-                />
+                <ListItemText sx={{ fontSize: "14px" }} primary="Logout" />
               </ListItemButton>
             </ListItem>
           </List>

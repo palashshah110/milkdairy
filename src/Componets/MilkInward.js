@@ -12,18 +12,19 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import axios from 'axios' 
+import axios from "axios";
 
 export default function MilkInward() {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  const [initialData, setInitialData] = useState([])
+  const [initialData, setInitialData] = useState([]);
+  const [data, setData] = useState([]); // Initially empty
+  const [shift, setShift] = useState("morning");
 
   async function getData() {
     try {
-      const response = await axios.get('http://localhost:4000/MilkInward')
-      const data = response.data.map( (item, index) => ({
+      const response = await axios.get("https://mymilkapp.glitch.me/milkInward");
+      const milkInwardData = response.data.map((item, index) => ({
         id: index + 1,
         fullName: item.fullName,
         fat: item.fat,
@@ -32,37 +33,50 @@ export default function MilkInward() {
         amount: item.amount,
         milk: item.milk,
         morning: item.morning,
-        evening: item.evening
-      }))
-      setInitialData(data)
+        evening: item.evening,
+      }));
+
+      const addInwardResponse = await axios.get(
+        "https://mymilkapp.glitch.me/addMilkInward"
+      );
+      const addInwardData = addInwardResponse.data.map((item, index) => ({
+        id: `milkInward-${index + 1}`,
+        fullName: item.fullName,
+        fat: item.fat,
+        litre: item.litre,
+        fatLitre: item.fat * item.litre,
+        amount: item.amount,
+        milk: item.milk,
+        morning: item.morning,
+        evening: item.evening,
+      }));
+
+      const combinedData = [...milkInwardData, ...addInwardData];
+      setInitialData(combinedData);
+      setData(combinedData.filter((item) => item.morning || item.evening));
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
   useEffect(() => {
-    getData()
-  }, [])
-
-  const [shift, setShift] = useState("morning");
-  const [data, setData] = useState([]); // Initially empty
+    getData();
+  }, []);
 
   useEffect(() => {
-    setData(initialData); // Sync data with initialData
-  }, [initialData]);
+    if (shift === "morning") {
+      setData(initialData.filter((item) => item.morning));
+    } else {
+      setData(initialData.filter((item) => item.evening));
+    }
+  }, [shift, initialData]);
 
   const handleShiftChange = (event) => {
-    const newShift = event.target.value;
-    setShift(newShift);
-    if (newShift === "evening") {
-      setData([...initialData].reverse());
-    } else {
-      setData(initialData);
-    }
+    setShift(event.target.value);
   };
 
   function handleAddInward() {
-    navigate('/AddMilkInward')
+    navigate("/AddMilkInward");
   }
 
   const columns = [
@@ -99,7 +113,9 @@ export default function MilkInward() {
           >
             Milk Inward
           </Box>
-          <Button onClick={handleAddInward} variant="outlined">Add</Button>
+          <Button onClick={handleAddInward} variant="outlined">
+            Add
+          </Button>
         </Box>
         <Box mb={2}>
           <Typography>Date: 18/07/2024</Typography>
@@ -107,10 +123,7 @@ export default function MilkInward() {
         <Box mb={2}>
           <FormControl>
             <Typography>Shift</Typography>
-            <Select
-              value={shift}
-              onChange={handleShiftChange}
-            >
+            <Select value={shift} onChange={handleShiftChange}>
               <MenuItem value="morning">Morning</MenuItem>
               <MenuItem value="evening">Evening</MenuItem>
             </Select>
@@ -135,4 +148,3 @@ export default function MilkInward() {
     </>
   );
 }
-

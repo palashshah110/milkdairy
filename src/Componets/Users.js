@@ -2,31 +2,30 @@ import React, { useEffect, useState } from "react";
 import { Box, Toolbar, Typography, Paper } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
-import axios from 'axios'
+import axios from "axios";
 
 export default function Users() {
-
-  const [row, setRow] = useState([])
+  const [row, setRow] = useState([]);
 
   async function getData() {
     try {
-      const response = await axios.get('http://localhost:4000/Users')
-      const data = response.data.map((item,index) => ({
+      const response = await axios.get("https://mymilkapp.glitch.me/Users");
+      const data = response.data.map((item, index) => ({
         id: index + 1,
-        fullName:item.fullName,
+        fullName: item.fullName,
         email: item.email,
-        password: item.password
-      }))
-      setRow(data)
+        password: item.password,
+      }));
+      setRow(data);
     } catch (error) {
-      console.error("Error while fetching:",error)
-    }   
+      console.error("Error while fetching:", error);
+    }
   }
-  
+
   useEffect(() => {
-    getData()
-  },[])
-  
+    getData();
+  }, []);
+
   const columns = [
     {
       field: "id",
