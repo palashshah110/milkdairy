@@ -18,7 +18,7 @@ import FaceIcon from "@mui/icons-material/Face";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const Logout = () => {
     navigate("/");
