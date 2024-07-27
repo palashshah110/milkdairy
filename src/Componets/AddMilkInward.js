@@ -62,7 +62,10 @@ const AddMilkInward = () => {
     };
 
     try {
-      await axios.post("https://mymilkapp.glitch.me/AddMilkInward", data);
+      const response = await axios.post("https://mymilkapp.glitch.me/milkInward", data);
+      if(response){
+        alert("Milk Inward Added");
+      }
     } catch (error) {
       console.log(error);
     }

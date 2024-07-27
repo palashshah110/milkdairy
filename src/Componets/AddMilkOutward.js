@@ -43,7 +43,7 @@ const AddMilkOutward = () => {
       evening: user.evening,
     };
     await axios
-      .post("https://mymilkapp.glitch.me/AddMilkOutward", data)
+      .post("https://mymilkapp.glitch.me/milkOutward", data)
       .then("success")
       .catch((error) => console.log(error));
 

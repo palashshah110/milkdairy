@@ -26,34 +26,11 @@ export default function MilkInward() {
       const response = await axios.get("https://mymilkapp.glitch.me/milkInward");
       const milkInwardData = response.data.map((item, index) => ({
         id: index + 1,
-        fullName: item.fullName,
-        fat: item.fat,
-        litre: item.litre,
-        fatLitre: item.fatLitre,
-        amount: item.amount,
-        milk: item.milk,
-        morning: item.morning,
-        evening: item.evening,
+        ...item
       }));
 
-      const addInwardResponse = await axios.get(
-        "https://mymilkapp.glitch.me/addMilkInward"
-      );
-      const addInwardData = addInwardResponse.data.map((item, index) => ({
-        id: `milkInward-${index + 1}`,
-        fullName: item.fullName,
-        fat: item.fat,
-        litre: item.litre,
-        fatLitre: item.fat * item.litre,
-        amount: item.amount,
-        milk: item.milk,
-        morning: item.morning,
-        evening: item.evening,
-      }));
-
-      const combinedData = [...milkInwardData, ...addInwardData];
-      setInitialData(combinedData);
-      setData(combinedData.filter((item) => item.morning || item.evening));
+      setInitialData(milkInwardData);
+      setData(milkInwardData.filter((item) => item.morning || item.evening));
     } catch (error) {
       console.error(error);
     }
@@ -67,7 +44,7 @@ export default function MilkInward() {
     if (shift === "morning") {
       setData(initialData.filter((item) => item.morning));
     } else {
-      setData(initialData.filter((item) => item.evening));
+      setData(initialData.reverse());
     }
   }, [shift, initialData]);
 
@@ -80,12 +57,12 @@ export default function MilkInward() {
   }
 
   const columns = [
-    { field: "fullName", headerName: "Full Name", flex: 1 },
-    { field: "fat", headerName: "Fat", flex: 1 },
-    { field: "litre", headerName: "Litre", flex: 1 },
-    { field: "fatLitre", headerName: "Fat Litre", flex: 1 },
-    { field: "amount", headerName: "Amount", flex: 1 },
-    { field: "milk", headerName: "Milk", flex: 1 },
+    { field: "fullName", headerName: "Full Name", flex: 1,headerAlign:'center',align:'center' },
+    { field: "fat", headerName: "Fat", flex: 1,headerAlign:'center',align:'center' },
+    { field: "litre", headerName: "Litre", flex: 1,headerAlign:'center',align:'center' },
+    { field: "fat", headerName: "Fat Litre", flex: 1,headerAlign:'center',align:'center' },
+    { field: "amount", headerName: "Amount", flex: 1,headerAlign:'center',align:'center' },
+    { field: "milk", headerName: "Milk", flex: 1,headerAlign:'center',align:'center' },
   ];
 
   return (

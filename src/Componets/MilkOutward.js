@@ -4,7 +4,6 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import dayjs from "dayjs";
 
 export default function MilkOutward() {
   const navigate = useNavigate();
@@ -12,37 +11,22 @@ export default function MilkOutward() {
   const [row, setRow] = useState([]);
 
   const columns = [
-    { field: "dates", headerName: "Dates", flex: 1 },
-    { field: "fullName", headerName: "Full Name", flex: 1 },
-    { field: "morning", headerName: "Morning (in Litre)", flex: 1 },
-    { field: "evening", headerName: "Evening (in Litre)", flex: 1 },
+    { field: "date", headerName: "Date", flex: 1,headerAlign:'center',align:'center' },
+    { field: "fullName", headerName: "Full Name", flex: 1,headerAlign:'center',align:'center' },
+    { field: "morning", headerName: "Morning (in Litre)", flex: 1 ,headerAlign:'center',align:'center'},
+    { field: "evening", headerName: "Evening (in Litre)", flex: 1,headerAlign:'center',align:'center' },
   ];
 
   async function getData() {
     try {
-      const [outwardResponse, addOutwardResponse] = await Promise.all([
-        axios.get("https://mymilkapp.glitch.me/milkOutward"),
-        axios.get("https://mymilkapp.glitch.me/AddMilkOutward"),
-      ]);
-
+      const outwardResponse = await axios.get("https://mymilkapp.glitch.me/milkOutward");
       const outwardData = outwardResponse.data.map((item, index) => ({
         id: index + 1,
-        dates: item.dates ? dayjs(item.dates).format('YYYY-MM-DD') : 'N/A',
-        fullName: item.fullName,
-        morning: item.morning,
-        evening: item.evening,
+        date: item.dates ? new Date(item.dates).toLocaleDateString() : 'N/A',
+        ...item
       }));
 
-      const addOutwardData = addOutwardResponse.data.map((item, index) => ({
-        id: outwardData.length + index + 1,
-        dates: item.dates ? dayjs(item.dates).format('YYYY-MM-DD') : 'N/A',
-        fullName: item.fullName,
-        morning: item.morning,
-        evening: item.evening,
-      }));
-      console.log(addOutwardData)
-
-      setRow([...outwardData, ...addOutwardData]);
+      setRow(outwardData);
     } catch (error) {
       console.error(error);
     }

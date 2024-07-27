@@ -8,21 +8,22 @@ import { useNavigate } from "react-router-dom";
 export default function Users() {
   const [row, setRow] = useState([]);
 
-  async function getData() {
-    try {
-      const response = await axios.get("https://mymilkapp.glitch.me/Users");
-      const data = response.data.map((item, index) => ({
-        id: index + 1,
-        ...item
-      }));
-      setRow(data);
-    } catch (error) {
-      console.error("Error while fetching:", error);
-    }
-  }
+
 
   useEffect(() => {
-    getData();
+    async function getData() {
+      try {
+        const response = await axios.get("https://mymilkapp.glitch.me/Users");
+        const data = response.data.map((item, index) => ({
+          id: index + 1,
+          ...item
+        }));
+        setRow(data);
+      } catch (error) {
+        console.error("Error while fetching:", error);
+      }
+    }
+    getData()
   }, []);
 
   const columns = [
