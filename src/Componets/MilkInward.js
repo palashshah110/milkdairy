@@ -18,7 +18,7 @@ export default function MilkInward() {
   const navigate = useNavigate();
 
   const [initialData, setInitialData] = useState([]);
-  const [data, setData] = useState([]); // Initially empty
+  const [data, setData] = useState([]);
   const [shift, setShift] = useState("morning");
 
   async function getData() {

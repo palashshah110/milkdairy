@@ -56,8 +56,11 @@ const AddMilkOutward = () => {
       const data = response.data.map((item, index) => ({
         id: index, 
         fullName: item.fullName,
+        role:item.role
       }));
-      setFullNameOptions(data);
+      const AllFilterUsers = data.filter((item) => {return item.role === "customer" || item.role === "shop"} );
+
+      setFullNameOptions(AllFilterUsers);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }

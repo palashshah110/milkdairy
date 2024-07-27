@@ -24,9 +24,9 @@ const AddMilkInward = () => {
     async function fetchOptions() {
       try {
         const response = await axios.get("https://mymilkapp.glitch.me/users");
-        setOptions(
-          response.data.map((user, index) => ({ ...user, id: index }))
-        );
+        const AllUsers = response.data.map((user, index) => ({ ...user, id: index }))
+        const AllFilterUsers = AllUsers.filter((item) => item.role === "milkman");
+        setOptions(AllFilterUsers);
       } catch (error) {
         console.error("Error fetching user options:", error);
       }

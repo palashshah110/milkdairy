@@ -7,6 +7,7 @@ import MilkInward from "./Componets/MilkInward";
 import MilkOutward from "./Componets/MilkOutward";
 import AddMilkOutward from "./Componets/AddMilkOutward";
 import AddMilkInward from "./Componets/AddMilkInward";
+import AddUsers from "./Componets/AddUsers";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Routes>
             <Route exact path="/" element={<Login />} />
             <Route path="/Users" element={<Users />} />
+            <Route path="/AddUsers" element={<AddUsers />} />
             <Route path="/MilkInward" element={<MilkInward />} />
             <Route path="/MilkOutward" element={<MilkOutward />} />
             <Route path="/AddMilkOutward" element={<AddMilkOutward />} />
