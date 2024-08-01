@@ -19,6 +19,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 export default function MilkInward() {
   const navigate = useNavigate();
 
+  const cowRate = 65;
+  const buffaloRate = 60;
+
   const [initialData, setInitialData] = useState([]);
   const [data, setData] = useState([]);
   const [shift, setShift] = useState("morning");
@@ -115,13 +118,13 @@ export default function MilkInward() {
       headerAlign: "center",
       align: "center",
     },
-    {
-      field: "rate",
-      headerName: "Rate",
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-    },
+    // {
+    //   field: "rate",
+    //   headerName: "Rate",
+    //   flex: 1,
+    //   headerAlign: "center",
+    //   align: "center",
+    // },
     {
       field: "amount",
       headerName: "Amount",
@@ -188,7 +191,9 @@ export default function MilkInward() {
         </Box>
         <Box mb={2} display="flex" gap={3} alignItems="center">
           <Typography>Date: {currentDate}</Typography>
-          <Typography>Rate: </Typography>
+          <Typography>Rate </Typography>
+          <Typography>Cow: {cowRate} </Typography>
+          <Typography>Buffalo: {buffaloRate} </Typography>    
         </Box>
 
         <Box mb={2} display="flex" flexDirection="row">
@@ -201,7 +206,7 @@ export default function MilkInward() {
           </FormControl>
 
           <FormControl>
-            <Typography>Milk</Typography>
+            <Typography>Milk Type</Typography>
             <Select
               value={milkType}
               onChange={handleMilkTypeChange}

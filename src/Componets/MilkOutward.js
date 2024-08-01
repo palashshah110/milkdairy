@@ -1,26 +1,82 @@
 import React, { useEffect, useState } from "react";
-import { Box, Toolbar, Paper, Button, Typography, FormControl, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Toolbar,
+  Paper,
+  Button,
+  Typography,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function MilkOutward() {
   const navigate = useNavigate();
 
   const [row, setRow] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
+  const [milkType, setMilkType] = useState("");
+
+
+  const cowRate = 65;
+  const buffaloRate = 60;
 
   const columns = [
-    { field: "date", headerName: "Date", flex: 1,headerAlign:'center',align:'center' },
-    { field: "fullName", headerName: "Full Name", flex: 1,headerAlign:'center',align:'center' },
-    { field: "milk", headerName: "Milk Type", flex: 1,headerAlign:'center',align:'center' },
-    { field: "quantity", headerName: "Quantity", flex: 1,headerAlign:'center',align:'center' },
-    { field: "amount", headerName: "Amount", flex: 1,headerAlign:'center',align:'center' },
-    { field: "morning", headerName: "Morning (in Litre)", flex: 1 ,headerAlign:'center',align:'center'},
-    { field: "evening", headerName: "Evening (in Litre)", flex: 1,headerAlign:'center',align:'center' },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "fullName",
+      headerName: "Full Name",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "milk",
+      headerName: "Milk Type",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "morning",
+      headerName: "Morning (in Litre)",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "evening",
+      headerName: "Evening (in Litre)",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -39,16 +95,18 @@ export default function MilkOutward() {
           />
         </>
       ),
-    }
+    },
   ];
 
   async function getData() {
     try {
-      const outwardResponse = await axios.get("https://mymilkapp.glitch.me/milkOutward");
+      const outwardResponse = await axios.get(
+        "https://mymilkapp.glitch.me/milkOutward"
+      );
       const outwardData = outwardResponse.data.map((item, index) => ({
         id: index + 1,
-        date: item.dates ? new Date(item.dates).toLocaleDateString() : 'N/A',
-        ...item
+        date: item.dates ? new Date(item.dates).toLocaleDateString() : "N/A",
+        ...item,
       }));
 
       setRow(outwardData);
@@ -64,10 +122,10 @@ export default function MilkOutward() {
   useEffect(() => {
     // Set current date
     const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    const formattedDate = today.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
     setCurrentDate(formattedDate);
 
@@ -78,6 +136,14 @@ export default function MilkOutward() {
   function handleAddButton() {
     navigate("/AddMilkOutward");
   }
+
+  function handleMilkTypeChange(event) {
+    setMilkType(event.target.value);
+  }
+
+  const filteredRows = row.filter(
+    (item) => milkType === "" || item.milk === milkType
+  );
 
   return (
     <>
@@ -110,14 +176,14 @@ export default function MilkOutward() {
         </Box>
 
         <Box mb={2} display="flex" flexDirection="row">
-
           <FormControl>
-            <Typography>Milk</Typography>
+            <Typography>Milk Type</Typography>
             <Select
-              // value={milkType}
-              // onChange={handleMilkTypeChange}
+              value={milkType}
+              onChange={handleMilkTypeChange}
               style={{ width: 100 }}
             >
+              <MenuItem value="">All</MenuItem>
               <MenuItem value="cow">Cow</MenuItem>
               <MenuItem value="buffalo">Buffalo</MenuItem>
             </Select>
@@ -127,14 +193,15 @@ export default function MilkOutward() {
         <Box mb={2} display="flex" gap={3} alignItems="center">
           <Typography>Date: {currentDate}</Typography>
           <Typography>Rate: </Typography>
+          <Typography>Cow: {cowRate} </Typography>
+          <Typography>Buffalo: {buffaloRate} </Typography>    
         </Box>
-
 
         <Box mb={2}></Box>
 
         <Paper sx={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={row}
+            rows={filteredRows}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
@@ -146,10 +213,9 @@ export default function MilkOutward() {
               },
             }}
           />
+          
         </Paper>
       </Box>
     </>
   );
 }
-
-

@@ -18,6 +18,7 @@ import axios from "axios";
 const AddMilkInward = () => {
   const navigate = useNavigate();
 
+
   const [user, setUser] = useState({
     fullName: "",
     fat: "",
@@ -72,19 +73,18 @@ const AddMilkInward = () => {
   }
 
   useEffect(() => {
-    // Determine if fields should be disabled based on the current time
+    
     const currentHour = new Date().getHours();
-
-    if (currentHour >= 6 && currentHour < 11) {
-      setIsEveningDisabled(true);
-      setIsMorningDisabled(false);
-    } else if (currentHour >= 16 && currentHour < 21) {
-      setIsMorningDisabled(true);
-      setIsEveningDisabled(false);
-    } else {
-      setIsMorningDisabled(false);
-      setIsEveningDisabled(false);
-    }
+    console.log("Current Hour:", currentHour);
+  
+    
+    const shouldDisableEvening = currentHour >= 6 && currentHour < 16;
+  
+  const shouldDisableMorning = currentHour >= 16 || currentHour < 6;
+    
+  
+    setIsEveningDisabled(shouldDisableEvening);
+    setIsMorningDisabled(shouldDisableMorning);
   }, []);
 
   function handleAutocompleteChange(event, value) {
@@ -251,7 +251,7 @@ const AddMilkInward = () => {
                 fullWidth
                 disabled={isEveningDisabled}
               />
-            </Grid>
+            </Grid> 
 
             <Grid item xs={12}>
               <Button

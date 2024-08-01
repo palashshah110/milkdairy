@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Grid, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Grid,
+  Paper,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -10,37 +20,69 @@ import axios from "axios";
 const AddMilkOutward = () => {
   const navigate = useNavigate();
 
+  const [isMorningDisabled, setIsMorningDisabled] = useState(false);
+  const [isEveningDisabled, setIsEveningDisabled] = useState(false);
+
   const [user, setUser] = useState({
-    milk:"",
+    milk: "",
     fullName: "",
     dates: null,
     morning: "",
-    quantity:"",
-    amount:"",
+    quantity: "",
+    amount: "",
     evening: "",
   });
 
+  const cowMilkRate = 60;
+  const buffaloMilkRate = 65;
+
   const [fullNameOptions, setFullNameOptions] = useState([]);
 
+  // Handle change in input fields
   function handleChange(e) {
     const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
+
+    setUser((prevState) => {
+      // Update user state with new value
+      const updatedUser = { ...prevState, [name]: value };
+
+      // Calculate the quantity and amount based on updated values
+      const morningQuantity = parseFloat(updatedUser.morning) || 0;
+      const eveningQuantity = parseFloat(updatedUser.evening) || 0;
+      const totalQuantity = morningQuantity + eveningQuantity;
+
+      // Determine rate based on milk type
+      const rate =
+        updatedUser.milk === "cow"
+          ? cowMilkRate
+          : updatedUser.milk === "buffalo"
+          ? buffaloMilkRate
+          : 0;
+
+      // Calculate amount
+      const amount = rate * totalQuantity;
+
+      return {
+        ...updatedUser,
+        quantity: totalQuantity,
+        amount: amount.toFixed(2), // Ensure amount is formatted to 2 decimal places
+      };
     });
   }
 
+  // Handle date change
   function handleDateChange(date) {
-    setUser({
-      ...user,
+    setUser((prevState) => ({
+      ...prevState,
       dates: date,
-    });
+    }));
   }
 
+  // Handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
     const data = {
-      milk:user.milk,
+      milk: user.milk,
       fullName: user.fullName,
       dates: user.dates,
       quantity: user.quantity,
@@ -50,33 +92,30 @@ const AddMilkOutward = () => {
     };
     await axios
       .post("https://mymilkapp.glitch.me/milkOutward", data)
-      .then("success")
+      .then(() => {
+        navigate("/MilkOutward");
+      })
       .catch((error) => console.log(error));
-
-    navigate("/MilkOutward");
-    console.log(data)
-    
+    console.log(data);
   }
 
+  // Disable morning and evening fields based on the current time
   useEffect(() => {
-    // Calculate amount whenever quantity or rate changes
-    const amount = user.quantity * user.rate;
-    setUser((prevState) => ({
-      ...prevState,
-      amount: amount,
-    }));
-  }, [user.quantity, user.rate]);
+    const currentHour = new Date().getHours();
+    setIsEveningDisabled(currentHour >= 6 && currentHour < 16);
+    setIsMorningDisabled(currentHour >= 16 || currentHour < 6);
+  }, []);
 
+  // Fetch user data for the autocomplete
   async function getUserData() {
     try {
       const response = await axios.get("https://mymilkapp.glitch.me/Users");
       const data = response.data.map((item, index) => ({
-        id: index, 
+        id: index,
         fullName: item.fullName,
-        role:item.role
+        role: item.role,
       }));
-      const AllFilterUsers = data.filter((item) => {return item.role === "customer" || item.role === "shop"} );
-
+      const AllFilterUsers = data.filter((item) => item.role === "customer" || item.role === "shop");
       setFullNameOptions(AllFilterUsers);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -105,7 +144,7 @@ const AddMilkOutward = () => {
         </Typography>
         <form noValidate autoComplete="off">
           <Grid container spacing={2} direction="row">
-          <Grid item xs={6}>
+            <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel id="milk-label">Milk</InputLabel>
                 <Select
@@ -119,7 +158,7 @@ const AddMilkOutward = () => {
                   <MenuItem value="buffalo">Buffalo</MenuItem>
                 </Select>
               </FormControl>
-            </Grid> 
+            </Grid>
             <Grid item xs={6}>
               <Autocomplete
                 style={{ width: "auto" }}
@@ -137,15 +176,40 @@ const AddMilkOutward = () => {
                   <TextField {...params} label="Full Name" />
                 )}
                 onChange={(event, newValue) => {
-                  setUser({
-                    ...user,
+                  setUser((prevState) => ({
+                    ...prevState,
                     fullName: newValue ? newValue.fullName : "",
-                  });
+                  }));
                 }}
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={6}>
+              <TextField
+                value={user.morning}
+                onChange={handleChange}
+                name="morning"
+                type="number"
+                label="Morning"
+                variant="outlined"
+                fullWidth
+                disabled={isMorningDisabled}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                value={user.evening}
+                onChange={handleChange}
+                name="evening"
+                type="number"
+                label="Evening"
+                variant="outlined"
+                fullWidth
+                disabled={isEveningDisabled}
+              />
+            </Grid>
+
+            <Grid item xs={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Pick a Date"
@@ -158,47 +222,14 @@ const AddMilkOutward = () => {
 
             <Grid item xs={6}>
               <TextField
-                name="quantity"
-                value={user.quantity}
-                onChange={handleChange}
-                type="number"
-                label="Quantity (in Litre)"
-                variant="outlined"
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
                 name="amount"
                 value={user.amount}
-                onChange={handleChange}
                 type="number"
                 label="Amount"
                 variant="outlined"
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                name="morning"
-                value={user.morning}
-                onChange={handleChange}
-                type="number"
-                label="Morning"
-                variant="outlined"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="evening"
-                value={user.evening}
-                onChange={handleChange}
-                type="number"
-                label="Evening"
-                variant="outlined"
+                InputProps={{
+                  readOnly: true,
+                }}
                 fullWidth
               />
             </Grid>
@@ -221,3 +252,4 @@ const AddMilkOutward = () => {
 };
 
 export default AddMilkOutward;
+

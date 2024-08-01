@@ -10,8 +10,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 export default function Users() {
   const [row, setRow] = useState([]);
 
-
-
   useEffect(() => {
     async function getData() {
       try {
@@ -28,16 +26,16 @@ export default function Users() {
     getData()
   }, []);
 
-  // const handleDelete = (row) => {
-  //   console.log("Delete clicked for:", row);
-  //   axios.delete(`https://mymilkapp.glitch.me/Users/${row.id}`)
-  //     .then(response => {
-  //       setRow((prevRows) => prevRows.filter((item) => item.id !== row.id));
-  //     })
-  //     .catch(error => {
-  //       console.error("Error while deleting:", error);
-  //     });
-  // };
+  const handleDelete = (row) => {
+    console.log("Delete clicked for:", row);
+    axios.delete(`https://mymilkapp.glitch.me/Users/${row.id}`)
+      .then(response => {
+        setRow((prevRows) => prevRows.filter((item) => item.id !== row.id));
+      })
+      .catch(error => {
+        console.error("Error while deleting:", error);
+      });
+  };
 
   const columns = [
     {
@@ -89,7 +87,7 @@ export default function Users() {
           />
           <DeleteIcon
             style={{ cursor: "pointer" }}
-            // onClick={() => handleDelete(params.row)}
+            onClick={() => handleDelete(params.row)}
           />
         </>
       ),
