@@ -1,20 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { Box, Toolbar, Paper, Button } from "@mui/material";
+import { Box, Toolbar, Paper, Button, Typography, FormControl, Select, MenuItem } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function MilkOutward() {
   const navigate = useNavigate();
 
   const [row, setRow] = useState([]);
+  const [currentDate, setCurrentDate] = useState("");
 
   const columns = [
     { field: "date", headerName: "Date", flex: 1,headerAlign:'center',align:'center' },
     { field: "fullName", headerName: "Full Name", flex: 1,headerAlign:'center',align:'center' },
+    { field: "milk", headerName: "Milk Type", flex: 1,headerAlign:'center',align:'center' },
+    { field: "quantity", headerName: "Quantity", flex: 1,headerAlign:'center',align:'center' },
+    { field: "amount", headerName: "Amount", flex: 1,headerAlign:'center',align:'center' },
     { field: "morning", headerName: "Morning (in Litre)", flex: 1 ,headerAlign:'center',align:'center'},
     { field: "evening", headerName: "Evening (in Litre)", flex: 1,headerAlign:'center',align:'center' },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <>
+          <EditIcon
+            style={{ cursor: "pointer", marginRight: 16 }}
+            // onClick={() => handleEdit(params.row)}
+          />
+          <DeleteIcon
+            style={{ cursor: "pointer" }}
+            // onClick={() => handleDelete(params.row)}
+          />
+        </>
+      ),
+    }
   ];
 
   async function getData() {
@@ -33,6 +58,20 @@ export default function MilkOutward() {
   }
 
   useEffect(() => {
+    getData();
+  }, []);
+
+  useEffect(() => {
+    // Set current date
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    setCurrentDate(formattedDate);
+
+    // Fetch data
     getData();
   }, []);
 
@@ -69,6 +108,29 @@ export default function MilkOutward() {
             Add
           </Button>
         </Box>
+
+        <Box mb={2} display="flex" flexDirection="row">
+
+          <FormControl>
+            <Typography>Milk</Typography>
+            <Select
+              // value={milkType}
+              // onChange={handleMilkTypeChange}
+              style={{ width: 100 }}
+            >
+              <MenuItem value="cow">Cow</MenuItem>
+              <MenuItem value="buffalo">Buffalo</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
+        <Box mb={2} display="flex" gap={3} alignItems="center">
+          <Typography>Date: {currentDate}</Typography>
+          <Typography>Rate: </Typography>
+        </Box>
+
+
+        <Box mb={2}></Box>
 
         <Paper sx={{ height: 400, width: "100%" }}>
           <DataGrid

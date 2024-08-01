@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Grid, Paper, Typography } from "@mui/material";
+import { TextField, Button, Grid, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -11,9 +11,12 @@ const AddMilkOutward = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
+    milk:"",
     fullName: "",
     dates: null,
     morning: "",
+    quantity:"",
+    amount:"",
     evening: "",
   });
 
@@ -37,8 +40,11 @@ const AddMilkOutward = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     const data = {
+      milk:user.milk,
       fullName: user.fullName,
       dates: user.dates,
+      quantity: user.quantity,
+      amount: user.amount,
       morning: user.morning,
       evening: user.evening,
     };
@@ -48,7 +54,18 @@ const AddMilkOutward = () => {
       .catch((error) => console.log(error));
 
     navigate("/MilkOutward");
+    console.log(data)
+    
   }
+
+  useEffect(() => {
+    // Calculate amount whenever quantity or rate changes
+    const amount = user.quantity * user.rate;
+    setUser((prevState) => ({
+      ...prevState,
+      amount: amount,
+    }));
+  }, [user.quantity, user.rate]);
 
   async function getUserData() {
     try {
@@ -88,7 +105,22 @@ const AddMilkOutward = () => {
         </Typography>
         <form noValidate autoComplete="off">
           <Grid container spacing={2} direction="row">
-            <Grid item xs={12}>
+          <Grid item xs={6}>
+              <FormControl variant="outlined" fullWidth>
+                <InputLabel id="milk-label">Milk</InputLabel>
+                <Select
+                  labelId="milk-label"
+                  value={user.milk}
+                  onChange={handleChange}
+                  name="milk"
+                  label="Milk"
+                >
+                  <MenuItem value="cow">Cow</MenuItem>
+                  <MenuItem value="buffalo">Buffalo</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid> 
+            <Grid item xs={6}>
               <Autocomplete
                 style={{ width: "auto" }}
                 disablePortal
@@ -122,6 +154,30 @@ const AddMilkOutward = () => {
                   renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                name="quantity"
+                value={user.quantity}
+                onChange={handleChange}
+                type="number"
+                label="Quantity (in Litre)"
+                variant="outlined"
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                name="amount"
+                value={user.amount}
+                onChange={handleChange}
+                type="number"
+                label="Amount"
+                variant="outlined"
+                fullWidth
+              />
             </Grid>
 
             <Grid item xs={6}>

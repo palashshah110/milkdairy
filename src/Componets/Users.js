@@ -4,6 +4,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function Users() {
   const [row, setRow] = useState([]);
@@ -25,6 +27,17 @@ export default function Users() {
     }
     getData()
   }, []);
+
+  // const handleDelete = (row) => {
+  //   console.log("Delete clicked for:", row);
+  //   axios.delete(`https://mymilkapp.glitch.me/Users/${row.id}`)
+  //     .then(response => {
+  //       setRow((prevRows) => prevRows.filter((item) => item.id !== row.id));
+  //     })
+  //     .catch(error => {
+  //       console.error("Error while deleting:", error);
+  //     });
+  // };
 
   const columns = [
     {
@@ -62,6 +75,26 @@ export default function Users() {
       headerAlign: "center",
       align: "center",
     },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <>
+          <EditIcon
+            style={{ cursor: "pointer", marginRight: 16 }}
+            // onClick={() => handleEdit(params.row)}
+          />
+          <DeleteIcon
+            style={{ cursor: "pointer" }}
+            // onClick={() => handleDelete(params.row)}
+          />
+        </>
+      ),
+    }
+
   ];
   const navigate = useNavigate();
   function handleAddInward() {
