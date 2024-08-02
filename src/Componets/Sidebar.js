@@ -13,9 +13,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 //icons
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import FaceIcon from "@mui/icons-material/Face";
-
+import { CreditCardOff, CreditScore, Group } from "@mui/icons-material";
+import LogoutIcon from '@mui/icons-material/Logout';
 export default function Sidebar() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
@@ -69,7 +68,7 @@ export default function Sidebar() {
             <ListItem disablePadding>
               <ListItemButton onClick={() => navigate("/Users")}>
                 <ListItemIcon>
-                  <FaceIcon sx={{ color: "#6945FF" }} />
+                  <Group sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: "14px" }} primary="Users" />
               </ListItemButton>
@@ -78,7 +77,7 @@ export default function Sidebar() {
             <ListItem disablePadding>
               <ListItemButton onClick={() => navigate("/MilkOutward")}>
                 <ListItemIcon>
-                  <FaceIcon sx={{ color: "#6945FF" }} />
+                  <CreditScore sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
                 <ListItemText
                   sx={{ fontSize: "14px" }}
@@ -90,7 +89,7 @@ export default function Sidebar() {
             <ListItem disablePadding>
               <ListItemButton onClick={() => navigate("/MilkInward")}>
                 <ListItemIcon>
-                  <FaceIcon sx={{ color: "#6945FF" }} />
+                  <CreditCardOff sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: "14px" }} primary="Milk Inward" />
               </ListItemButton>
@@ -99,7 +98,7 @@ export default function Sidebar() {
             <ListItem disablePadding>
               <ListItemButton onClick={Logout}>
                 <ListItemIcon>
-                  <ApartmentIcon sx={{ color: "#6945FF" }} />
+                  <LogoutIcon sx={{ color: "#6945FF" }} />
                 </ListItemIcon>
                 <ListItemText sx={{ fontSize: "14px" }} primary="Logout" />
               </ListItemButton>

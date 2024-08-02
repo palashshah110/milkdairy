@@ -26,8 +26,7 @@ export default function MilkInward() {
   const [data, setData] = useState([]);
   const [shift, setShift] = useState("morning");
   const [currentDate, setCurrentDate] = useState("");
-  const [milkType, setMilkType] = useState("");
-
+  const [milkType, setMilkType] = useState("All");
   async function getData() {
     try {
       const response = await axios.get(
@@ -39,19 +38,11 @@ export default function MilkInward() {
       }));
 
       setInitialData(milkInwardData);
-      setData(
-        milkInwardData.filter((item) =>
-          shift === "morning" ? item.morning : item.evening
-        )
-      );
+      setData(milkInwardData); // Show all data by default
     } catch (error) {
       console.error(error);
     }
   }
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   useEffect(() => {
     // Set current date
@@ -72,7 +63,7 @@ export default function MilkInward() {
       initialData.filter(
         (item) =>
           (shift === "morning" ? item.morning : item.evening) &&
-          (milkType ? item.milk.toLowerCase() === milkType.toLowerCase() : true)
+          (milkType === "All" || item.milk.toLowerCase() === milkType.toLowerCase())
       )
     );
   }, [shift, milkType, initialData]);
@@ -88,7 +79,15 @@ export default function MilkInward() {
   function handleAddInward() {
     navigate("/AddMilkInward");
   }
-
+  const handleDelete = async(id)=>{
+    try{
+      const response = await axios.delete(`https://mymilkapp.glitch.me/milkInward/${id}`);
+      getData()
+      alert(response.data.message)
+    }catch(err){
+      console.log(err)
+    }
+  }
   const columns = [
     {
       field: "fullName",
@@ -118,13 +117,6 @@ export default function MilkInward() {
       headerAlign: "center",
       align: "center",
     },
-    // {
-    //   field: "rate",
-    //   headerName: "Rate",
-    //   flex: 1,
-    //   headerAlign: "center",
-    //   align: "center",
-    // },
     {
       field: "amount",
       headerName: "Amount",
@@ -153,7 +145,7 @@ export default function MilkInward() {
           />
           <DeleteIcon
             style={{ cursor: "pointer" }}
-            // onClick={() => handleDelete(params.row)}
+            onClick={() => handleDelete(params.row._id)}
           />
         </>
       ),
@@ -192,8 +184,8 @@ export default function MilkInward() {
         <Box mb={2} display="flex" gap={3} alignItems="center">
           <Typography>Date: {currentDate}</Typography>
           <Typography>Rate </Typography>
-          <Typography>Cow: {cowRate} </Typography>
-          <Typography>Buffalo: {buffaloRate} </Typography>    
+          <Typography>Cow: {cowRate} / liter</Typography>
+          <Typography>Buffalo: {buffaloRate} / liter</Typography>    
         </Box>
 
         <Box mb={2} display="flex" flexDirection="row">
@@ -212,6 +204,7 @@ export default function MilkInward() {
               onChange={handleMilkTypeChange}
               style={{ width: 100 }}
             >
+              <MenuItem value="All">All</MenuItem>
               <MenuItem value="cow">Cow</MenuItem>
               <MenuItem value="buffalo">Buffalo</MenuItem>
             </Select>

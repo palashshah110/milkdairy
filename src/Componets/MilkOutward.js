@@ -21,8 +21,7 @@ export default function MilkOutward() {
 
   const [row, setRow] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
-  const [milkType, setMilkType] = useState("");
-
+  const [milkType, setMilkType] = useState('All');
 
   const cowRate = 65;
   const buffaloRate = 60;
@@ -45,13 +44,6 @@ export default function MilkOutward() {
     {
       field: "milk",
       headerName: "Milk Type",
-      flex: 1,
-      headerAlign: "center",
-      align: "center",
-    },
-    {
-      field: "quantity",
-      headerName: "Quantity",
       flex: 1,
       headerAlign: "center",
       align: "center",
@@ -91,7 +83,7 @@ export default function MilkOutward() {
           />
           <DeleteIcon
             style={{ cursor: "pointer" }}
-            // onClick={() => handleDelete(params.row)}
+            onClick={() => handleDelete(params.row._id)}
           />
         </>
       ),
@@ -142,8 +134,18 @@ export default function MilkOutward() {
   }
 
   const filteredRows = row.filter(
-    (item) => milkType === "" || item.milk === milkType
+    (item) => milkType === "All" || item.milk === milkType
   );
+
+  const handleDelete = async(id)=>{
+    try{
+      const response = await axios.delete(`https://mymilkapp.glitch.me/milkOutward/${id}`);
+      alert(response.data.message)
+      getData()
+    }catch(err){
+      console.log(err)
+    }
+  }
 
   return (
     <>
@@ -174,27 +176,26 @@ export default function MilkOutward() {
             Add
           </Button>
         </Box>
-
         <Box mb={2} display="flex" flexDirection="row">
-          <FormControl>
-            <Typography>Milk Type</Typography>
-            <Select
-              value={milkType}
-              onChange={handleMilkTypeChange}
-              style={{ width: 100 }}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="cow">Cow</MenuItem>
-              <MenuItem value="buffalo">Buffalo</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-
-        <Box mb={2} display="flex" gap={3} alignItems="center">
+      <FormControl>
+        <Typography>Milk Type</Typography>
+        <Select
+          value={milkType}
+          onChange={handleMilkTypeChange}
+          style={{ width: 100 }}
+          defaultValue={milkType}
+        >
+          <MenuItem value="All" selected>All</MenuItem>
+          <MenuItem value="cow">Cow</MenuItem>
+          <MenuItem value="buffalo">Buffalo</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+          <Box mb={2} display="flex" gap={3} alignItems="center">
           <Typography>Date: {currentDate}</Typography>
           <Typography>Rate: </Typography>
-          <Typography>Cow: {cowRate} </Typography>
-          <Typography>Buffalo: {buffaloRate} </Typography>    
+          <Typography>Cow: {cowRate} / liter </Typography>
+          <Typography>Buffalo: {buffaloRate} / liter </Typography>
         </Box>
 
         <Box mb={2}></Box>
@@ -213,7 +214,6 @@ export default function MilkOutward() {
               },
             }}
           />
-          
         </Paper>
       </Box>
     </>
