@@ -27,10 +27,9 @@ export default function Users() {
   }, []);
 
   const handleDelete = (row) => {
-    console.log("Delete clicked for:", row);
-    axios.delete(`https://mymilkapp.glitch.me/Users/${row.id}`)
-      .then(response => {
-        setRow((prevRows) => prevRows.filter((item) => item.id !== row.id));
+    axios.delete(`https://mymilkapp.glitch.me/Users/${row._id}`)
+      .then(() => {
+        setRow((prevRows) => prevRows.filter((item) => item.id !== row._id));
       })
       .catch(error => {
         console.error("Error while deleting:", error);
