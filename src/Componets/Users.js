@@ -4,36 +4,39 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "./Header";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function Users() {
   const [row, setRow] = useState([]);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get("https://mymilkapp.glitch.me/Users");
-        const data = response.data.map((item, index) => ({
-          id: index + 1,
-          ...item
-        }));
-        setRow(data);
-      } catch (error) {
-        console.error("Error while fetching:", error);
-      }
+  async function getData() {
+    try {
+      const response = await axios.get("https://mymilkapp.glitch.me/Users");
+      const data = response.data.map((item, index) => ({
+        id: index + 1,
+        ...item,
+      }));
+      setRow(data);
+    } catch (error) {
+      console.error("Error while fetching:", error);
     }
-    getData()
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
-  const handleDelete = (row) => {
-    axios.delete(`https://mymilkapp.glitch.me/Users/${row._id}`)
-      .then(() => {
-        setRow((prevRows) => prevRows.filter((item) => item.id !== row._id));
-      })
-      .catch(error => {
-        console.error("Error while deleting:", error);
-      });
+  const handleDelete = async(row) => {
+    try {
+      const res = await axios.delete(`https://mymilkapp.glitch.me/Users/${row._id}`)
+      if(res){
+        alert("User Deleted")
+        getData();
+      }
+    } catch (err) {
+      console.error("Error while deleting:", err);
+    }
   };
 
   const columns = [
@@ -57,7 +60,7 @@ export default function Users() {
       flex: 2,
       headerAlign: "center",
       align: "center",
-    },    
+    },
     {
       field: "mobileNumber",
       headerName: "Mobile Number",
@@ -90,9 +93,9 @@ export default function Users() {
           />
         </>
       ),
-    }
-
+    },
   ];
+
   const navigate = useNavigate();
   function handleAddInward() {
     navigate("/AddUsers");
