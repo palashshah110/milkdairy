@@ -34,7 +34,7 @@ const AddMilkOutward = () => {
   });
 
   const cowMilkRate = 60;
-  const buffaloMilkRate = 65;
+  const buffaloMilkRate = 70;
 
   const [fullNameOptions, setFullNameOptions] = useState([]);
 

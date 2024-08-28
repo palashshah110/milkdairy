@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 export default function MilkInward() {
   const navigate = useNavigate();
 
-  const cowRate = 65;
+  const cowRate = 70;
   const buffaloRate = 60;
 
   const [initialData, setInitialData] = useState([]);

@@ -23,7 +23,7 @@ export default function MilkOutward() {
   const [currentDate, setCurrentDate] = useState("");
   const [milkType, setMilkType] = useState('All');
 
-  const cowRate = 65;
+  const cowRate = 70;
   const buffaloRate = 60;
 
   const columns = [
