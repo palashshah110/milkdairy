@@ -10,8 +10,6 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Autocomplete from "@mui/material/Autocomplete";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
@@ -19,76 +17,54 @@ import axios from "axios";
 
 const AddMilkOutward = () => {
   const navigate = useNavigate();
-
-  const [isMorningDisabled, setIsMorningDisabled] = useState(false);
-  const [isEveningDisabled, setIsEveningDisabled] = useState(false);
-
-  const [user, setUser] = useState({
-    milk: "",
-    fullName: "",
-    dates: null,
-    morning: "",
-    quantity: "",
-    amount: "",
-    evening: "",
-  });
-
   const cowMilkRate = 60;
   const buffaloMilkRate = 70;
 
+  const [user, setUser] = useState({
+    dates: new Date().toISOString().split("T")[0],
+    shift: "",
+    fullName: "",
+    cowMilk: "",
+    buffaloMilk: "",
+    cowAmount: "",
+    buffaloAmount: "",
+  });
+
   const [fullNameOptions, setFullNameOptions] = useState([]);
 
-  // Handle change in input fields
+  // Handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
 
     setUser((prevState) => {
-      // Update user state with new value
       const updatedUser = { ...prevState, [name]: value };
 
-      // Calculate the quantity and amount based on updated values
-      const morningQuantity = parseFloat(updatedUser.morning) || 0;
-      const eveningQuantity = parseFloat(updatedUser.evening) || 0;
-      const totalQuantity = morningQuantity + eveningQuantity;
+      // Calculate amounts based on milk quantity
+      const cowMilkQuantity = parseFloat(updatedUser.cowMilk) || 0;
+      const buffaloMilkQuantity = parseFloat(updatedUser.buffaloMilk) || 0;
 
-      // Determine rate based on milk type
-      const rate =
-        updatedUser.milk === "cow"
-          ? cowMilkRate
-          : updatedUser.milk === "buffalo"
-          ? buffaloMilkRate
-          : 0;
-
-      // Calculate amount
-      const amount = rate * totalQuantity;
+      const cowAmount = (cowMilkQuantity * cowMilkRate).toFixed(2);
+      const buffaloAmount = (buffaloMilkQuantity * buffaloMilkRate).toFixed(2);
 
       return {
         ...updatedUser,
-        quantity: totalQuantity,
-        amount: amount.toFixed(2), // Ensure amount is formatted to 2 decimal places
+        cowAmount,
+        buffaloAmount,
       };
     });
-  }
-
-  // Handle date change
-  function handleDateChange(date) {
-    setUser((prevState) => ({
-      ...prevState,
-      dates: date,
-    }));
   }
 
   // Handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
     const data = {
-      milk: user.milk,
-      fullName: user.fullName,
       dates: user.dates,
-      quantity: user.quantity,
-      amount: user.amount,
-      morning: user.morning,
-      evening: user.evening,
+      shift: user.shift,
+      fullName: user.fullName,
+      cowMilk: user.cowMilk,
+      buffaloMilk: user.buffaloMilk,
+      cowAmount: user.cowAmount,
+      buffaloAmount: user.buffaloAmount,
     };
     await axios
       .post("https://mymilkapp.glitch.me/milkOutward", data)
@@ -96,15 +72,7 @@ const AddMilkOutward = () => {
         navigate("/MilkOutward");
       })
       .catch((error) => console.log(error));
-    console.log(data);
   }
-
-  // Disable morning and evening fields based on the current time
-  useEffect(() => {
-    const currentHour = new Date().getHours();
-    setIsEveningDisabled(currentHour >= 6 && currentHour < 16);
-    setIsMorningDisabled(currentHour >= 16 || currentHour < 6);
-  }, []);
 
   // Fetch user data for the autocomplete
   async function getUserData() {
@@ -115,8 +83,8 @@ const AddMilkOutward = () => {
         fullName: item.fullName,
         role: item.role,
       }));
-      const AllFilterUsers = data.filter((item) => item.role === "customer" || item.role === "shop");
-      setFullNameOptions(AllFilterUsers);
+      const filteredUsers = data.filter((item) => item.role === "customer" || item.role === "shop");
+      setFullNameOptions(filteredUsers);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -129,52 +97,46 @@ const AddMilkOutward = () => {
   return (
     <>
       <Header />
-      <Paper
-        elevation={3}
-        style={{
-          padding: "20px",
-          width: "700px",
-          maxWidth: "700px",
-          margin: "auto",
-          marginTop: "100px",
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
+      <Paper elevation={3} style={{ padding: "20px", width: "700px", margin: "auto", marginTop: "100px" }}>
+        <Typography variant="h4" gutterBottom textAlign={"center"}>
           Add Outward Milk
         </Typography>
         <form noValidate autoComplete="off">
           <Grid container spacing={2} direction="row">
+          <Grid item xs={6}>
+              <TextField
+                label="Pick a Date"
+                type="date"
+                value={user.dates}
+                onChange={handleChange}
+                name="dates"
+                fullWidth
+                InputLabelProps={{ shrink: true }} // Keeps the label above the date input
+              />
+            </Grid>
+
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth>
-                <InputLabel id="milk-label">Milk</InputLabel>
+                <InputLabel id="shift-label">Shift</InputLabel>
                 <Select
-                  labelId="milk-label"
-                  value={user.milk}
+                  labelId="shift-label"
+                  value={user.shift}
                   onChange={handleChange}
-                  name="milk"
-                  label="Milk"
+                  name="shift"
+                  label="Shift"
                 >
-                  <MenuItem value="cow">Cow</MenuItem>
-                  <MenuItem value="buffalo">Buffalo</MenuItem>
+                  <MenuItem value="morning">Morning</MenuItem>
+                  <MenuItem value="evening">Evening</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6}>
+
+            <Grid item xs={12} md={12}>
               <Autocomplete
-                style={{ width: "auto" }}
-                disablePortal
-                id="combo-box-demo"
+                id="fullName"
                 options={fullNameOptions}
                 getOptionLabel={(option) => option.fullName}
-                sx={{ width: 300 }}
-                renderOption={(props, option) => (
-                  <li {...props} key={option.id}>
-                    {option.fullName}
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField {...params} label="Full Name" />
-                )}
+                renderInput={(params) => <TextField {...params} label="Full Name" />}
                 onChange={(event, newValue) => {
                   setUser((prevState) => ({
                     ...prevState,
@@ -186,50 +148,46 @@ const AddMilkOutward = () => {
 
             <Grid item xs={6}>
               <TextField
-                value={user.morning}
+                value={user.cowMilk}
                 onChange={handleChange}
-                name="morning"
+                name="cowMilk"
                 type="number"
-                label="Morning"
+                label="Cow Milk (L)"
                 variant="outlined"
                 fullWidth
-                disabled={isMorningDisabled}
               />
             </Grid>
             <Grid item xs={6}>
               <TextField
-                value={user.evening}
+                value={user.buffaloMilk}
                 onChange={handleChange}
-                name="evening"
+                name="buffaloMilk"
                 type="number"
-                label="Evening"
+                label="Buffalo Milk (L)"
                 variant="outlined"
                 fullWidth
-                disabled={isEveningDisabled}
               />
             </Grid>
 
             <Grid item xs={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Pick a Date"
-                  value={user.dates}
-                  onChange={handleDateChange}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
+              <TextField
+                name="cowAmount"
+                value={user.cowAmount}
+                type="number"
+                label="Cow Milk Amount"
+                variant="outlined"
+                InputProps={{ readOnly: true }}
+                fullWidth
+              />
             </Grid>
-
             <Grid item xs={6}>
               <TextField
-                name="amount"
-                value={user.amount}
+                name="buffaloAmount"
+                value={user.buffaloAmount}
                 type="number"
-                label="Amount"
+                label="Buffalo Milk Amount"
                 variant="outlined"
-                InputProps={{
-                  readOnly: true,
-                }}
+                InputProps={{ readOnly: true }}
                 fullWidth
               />
             </Grid>
@@ -252,4 +210,3 @@ const AddMilkOutward = () => {
 };
 
 export default AddMilkOutward;
-
