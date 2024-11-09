@@ -9,21 +9,20 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Header from "./Header";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { ToastContainer, toast } from "react-toastify";
 const AddMilkOutward = () => {
-  const navigate = useNavigate();
   const cowMilkRate = 60;
   const buffaloMilkRate = 70;
 
   const [user, setUser] = useState({
     dates: new Date().toISOString().split("T")[0],
     shift: "",
-    fullName: "",
+    fullName: null,
     cowMilk: "",
     buffaloMilk: "",
     cowAmount: "",
@@ -31,7 +30,7 @@ const AddMilkOutward = () => {
   });
 
   const [fullNameOptions, setFullNameOptions] = useState([]);
-
+  const [loading, setLoading] = useState(false)
   // Handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
@@ -57,6 +56,8 @@ const AddMilkOutward = () => {
   // Handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true); // Start loading
+
     const data = {
       dates: user.dates,
       shift: user.shift,
@@ -66,20 +67,34 @@ const AddMilkOutward = () => {
       cowAmount: user.cowAmount,
       buffaloAmount: user.buffaloAmount,
     };
-    await axios
-      .post("https://mymilkapp.glitch.me/milkOutward", data)
-      .then(() => {
-        navigate("/MilkOutward");
-      })
-      .catch((error) => console.log(error));
+
+    try {
+      await axios.post("http://mymilkapp.glitch.me/milkOutward", data);
+      toast.success("Outward Added Successfully");
+      setUser({
+        dates: new Date().toISOString().split("T")[0],
+        shift: user.shift,
+        fullName: "",
+        cowMilk: "",
+        buffaloMilk: "",
+        cowAmount: "",
+        buffaloAmount: "",
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to add outward.");
+    } finally {
+      setLoading(false); // Stop loading
+    }
   }
 
+  console.log(user)
   // Fetch user data for the autocomplete
   async function getUserData() {
     try {
-      const response = await axios.get("https://mymilkapp.glitch.me/Users");
+      const response = await axios.get("http://mymilkapp.glitch.me/Users");
       const data = response.data.map((item, index) => ({
-        id: index,
+        _id: item._id,
         fullName: item.fullName,
         role: item.role,
       }));
@@ -103,7 +118,7 @@ const AddMilkOutward = () => {
         </Typography>
         <form noValidate autoComplete="off">
           <Grid container spacing={2} direction="row">
-          <Grid item xs={6}>
+            <Grid item xs={6}>
               <TextField
                 label="Pick a Date"
                 type="date"
@@ -135,14 +150,17 @@ const AddMilkOutward = () => {
               <Autocomplete
                 id="fullName"
                 options={fullNameOptions}
-                getOptionLabel={(option) => option.fullName}
+                getOptionLabel={(option) => (option ? option.fullName : "")}  // Handle null cases
                 renderInput={(params) => <TextField {...params} label="Full Name" />}
                 onChange={(event, newValue) => {
                   setUser((prevState) => ({
                     ...prevState,
-                    fullName: newValue ? newValue.fullName : "",
+                    fullName: newValue ? newValue.fullName : "", // Update user.fullName
                   }));
                 }}
+                value={
+                  fullNameOptions.find((option) => option.fullName === user.fullName) || null
+                } // Ensure value matches selected fullName or defaults to null
               />
             </Grid>
 
@@ -198,13 +216,15 @@ const AddMilkOutward = () => {
                 color="primary"
                 fullWidth
                 onClick={handleSubmit}
+                disabled={loading} 
               >
-                Submit
+                  {loading ? <CircularProgress size={24} color="inherit" /> : "Submit"}
               </Button>
             </Grid>
           </Grid>
         </form>
       </Paper>
+      <ToastContainer />
     </>
   );
 };

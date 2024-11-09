@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function MilkOutward() {
   const navigate = useNavigate();
@@ -94,8 +95,9 @@ export default function MilkOutward() {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(`https://mymilkapp.glitch.me/milkOutward/${id}`);
-      alert(response.data.message);
+      toast.success(response.data.message);
       getData();
+
     } catch (err) {
       console.log(err);
     }
@@ -130,8 +132,11 @@ export default function MilkOutward() {
           <DataGrid
             rows={filteredRows}
             columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5]}
+            initialState={{
+              ...rows.initialState,
+              pagination: { paginationModel: { pageSize: 5} },
+            }}
+            pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
             disableSelectionOnClick
             sx={{
               "& .MuiDataGrid-columnHeaders": {
@@ -142,6 +147,7 @@ export default function MilkOutward() {
           />
         </Paper>
       </Box>
+      <ToastContainer/>
     </>
   );
 }
