@@ -9,119 +9,107 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Header from "./Header";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const AddMilkInward = () => {
-  const navigate = useNavigate();
-
-
   const [user, setUser] = useState({
+    dates: new Date().toISOString().split("T")[0], // Default to today's date
+    shift: "",
     fullName: "",
-    fat: "",
-    litre: "",
-    fatLitre: "",
-    amount: "",
-    milk: "",
-    morning: "",
-    evening: "",
+    buffaloRate: 70, 
+    buffaloFat: "",
+    buffaloLitre: "",
+    buffaloTotal: "",
+    cowRate: 60, 
+    cowFat: "",
+    cowLitre: "",
+    cowTotal: "",
   });
-
   const [options, setOptions] = useState([]);
-  const [isMorningDisabled, setIsMorningDisabled] = useState(false);
-  const [isEveningDisabled, setIsEveningDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Fetching options for full name
     async function fetchOptions() {
       try {
         const response = await axios.get("https://mymilkapp.glitch.me/users");
-        const AllUsers = response.data.map((user, index) => ({
-          ...user,
-          id: index,
-        }));
-        const AllFilterUsers = AllUsers.filter(
-          (item) => item.role === "milkman"
-        );
-        setOptions(AllFilterUsers);
+        const users = response.data.filter((user) => user.role === "milkman");
+        setOptions(users);
       } catch (error) {
         console.error("Error fetching user options:", error);
       }
     }
-
     fetchOptions();
   }, []);
 
   useEffect(() => {
-    // Calculate fatLitre whenever fat or litre changes
-    const fatLitre = user.fat * user.litre;
+    // Calculate buffalo and cow totals
+    const buffaloTotal = (user.buffaloFat * user.buffaloLitre * user.buffaloRate).toFixed(2);
+    const cowTotal = (user.cowFat * user.cowLitre * user.cowRate).toFixed(2);
+
     setUser((prevState) => ({
       ...prevState,
-      fatLitre: fatLitre,
-      amount: fatLitre * 10,
+      buffaloTotal,
+      cowTotal,
     }));
-  }, [user.fat, user.litre]);
+  }, [user.buffaloFat, user.buffaloLitre,user.buffaloRate,user.cowRate, user.cowFat, user.cowLitre]);
 
-  function handleChange(e) {
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
-  }
+    setUser({ ...user, [name]: value });
+  };
 
-  useEffect(() => {
-    
-    const currentHour = new Date().getHours();
-    console.log("Current Hour:", currentHour);
-  
-    
-    const shouldDisableEvening = currentHour >= 6 && currentHour < 16;
-  
-  const shouldDisableMorning = currentHour >= 16 || currentHour < 6;
-    
-  
-    setIsEveningDisabled(shouldDisableEvening);
-    setIsMorningDisabled(shouldDisableMorning);
-  }, []);
+  const handleAutocompleteChange = (event, value) => {
+    setUser({ ...user, fullName: value ? value.fullName : "" });
+  };
 
-  function handleAutocompleteChange(event, value) {
-    setUser({
-      ...user,
-      fullName: value ? value.fullName : "",
-    });
-  }
-
-  async function handleSubmit() {
+  const handleSubmit = async () => {
+    setLoading(true);
     const data = {
+      date: user.dates,
+      shift: user.shift,
       fullName: user.fullName,
-      fat: user.fat,
-      litre: user.litre,
-      fatLitre: user.fat * user.litre,
-      amount: user.amount,
-      milk: user.milk,
-      morning: user.morning,
-      evening: user.evening,
-    };
-
-    console.log(data);
-
-    try {
-      const response = await axios.post(
-        "https://mymilkapp.glitch.me/milkInward",
-        data
-      );
-      if (response) {
-        alert("Milk Inward Added");
+      buffalo: {
+        rate: user.buffaloRate,
+        fat: user.buffaloFat,
+        litre: user.buffaloLitre,
+        amount: user.buffaloTotal
+      },
+      cow: {
+        rate: user.cowRate,
+        fat: user.cowFat,
+        litre: user.cowLitre,
+        amount: user.cowTotal
       }
+    };
+    try {
+      await axios.post("https://mymilkapp.glitch.me/milkInward", data);
+      toast.success("Milk Inward Added");
+      setUser({
+        dates: new Date().toISOString().split("T")[0],
+        shift: data.shift,
+        fullName: "",
+        buffaloRate: 70, 
+        buffaloFat: "",
+        buffaloLitre: "",
+        buffaloTotal: "",
+        cowRate: 60, 
+        cowFat: "",
+        cowLitre: "",
+        cowTotal: "",
+      })
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/MilkInward");
-  }
+  };
 
   return (
     <>
@@ -136,122 +124,143 @@ const AddMilkInward = () => {
           marginTop: "100px",
         }}
       >
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom textAlign="center">
           Add Inward Milk
         </Typography>
         <form noValidate autoComplete="off">
-          <Grid container spacing={2} direction="row">
+          <Grid container spacing={2}>
             <Grid item xs={6}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel id="milk-label">Milk</InputLabel>
+              <TextField
+                label="Date"
+                variant="outlined"
+                fullWidth
+                name="dates"
+                value={user.dates}
+                onChange={handleChange}
+                disabled
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Shift</InputLabel>
                 <Select
-                  labelId="milk-label"
-                  value={user.milk}
+                  name="shift"
+                  value={user.shift}
                   onChange={handleChange}
-                  name="milk"
-                  label="Milk"
+                  label="Shift"
                 >
-                  <MenuItem value="cow">Cow</MenuItem>
-                  <MenuItem value="buffalo">Buffalo</MenuItem>
+                  <MenuItem value="morning" >
+                    Morning
+                  </MenuItem>
+                  <MenuItem value="evening">
+                    Evening
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <Autocomplete
-                style={{ width: "auto" }}
-                disablePortal
-                id="combo-box-demo"
                 options={options}
-                getOptionLabel={(option) => (option ? option.fullName : "")}
-                renderOption={(props, option) => (
-                  <li {...props} key={option.id}>
-                    {option.fullName}
-                  </li>
-                )}
-                value={
-                  options.find((opt) => opt.fullName === user.fullName) || null
-                }
-                onChange={handleAutocompleteChange}
+                getOptionLabel={(option) => option.fullName || ""}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Full Name"
-                    variant="outlined"
-                    fullWidth
-                  />
+                  <TextField {...params} label="Full Name" variant="outlined" fullWidth />
                 )}
+                onChange={handleAutocompleteChange}
+                value={options.find((opt) => opt.fullName === user.fullName) || null}
               />
             </Grid>
 
-            <Grid item xs={6}>
+            {/* Buffalo Milk Section */}
+            <Grid item xs={12}>
+              <Typography variant="h6">Buffalo Milk</Typography>
+            </Grid>
+            <Grid item xs={3}>
               <TextField
-                value={user.fat}
-                onChange={handleChange}
-                name="fat"
+                label="Rate"
+                variant="outlined"
+                fullWidth
+                name="buffaloRate"
+                value={user.buffaloRate}
+                disabled
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
                 label="Fat"
                 variant="outlined"
                 fullWidth
+                name="buffaloFat"
+                value={user.buffaloFat}
+                onChange={handleChange}
               />
             </Grid>
-
-            <Grid item xs={6}>
+            <Grid item xs={3}>
               <TextField
-                value={user.litre}
-                onChange={handleChange}
-                name="litre"
                 label="Litre"
                 variant="outlined"
                 fullWidth
+                name="buffaloLitre"
+                value={user.buffaloLitre}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                label="Total"
+                variant="outlined"
+                fullWidth
+                name="buffaloTotal"
+                value={user.buffaloTotal}
+                disabled
               />
             </Grid>
 
-            <Grid item xs={6}>
+            {/* Cow Milk Section */}
+            <Grid item xs={12}>
+              <Typography variant="h6">Cow Milk</Typography>
+            </Grid>
+            <Grid item xs={3}>
               <TextField
-                value={user.fatLitre}
-                onChange={handleChange}
-                name="fatLitre"
-                label="Fat Litre"
+                label="Rate"
                 variant="outlined"
                 fullWidth
+                name="cowRate"
+                value={user.cowRate}
+                disabled
               />
             </Grid>
-
-            <Grid item xs={6}>
+            <Grid item xs={3}>
               <TextField
-                value={user.amount}
-                onChange={handleChange}
-                name="amount"
-                label="Amount"
+                label="Fat"
                 variant="outlined"
                 fullWidth
+                name="cowFat"
+                value={user.cowFat}
+                onChange={handleChange}
               />
             </Grid>
-
-            <Grid item xs={6}>
+            <Grid item xs={3}>
               <TextField
-                value={user.morning}
-                onChange={handleChange}
-                name="morning"
-                type="number"
-                label="Morning"
+                label="Litre"
                 variant="outlined"
                 fullWidth
-                disabled={isMorningDisabled}
+                name="cowLitre"
+                value={user.cowLitre}
+                onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={3}>
               <TextField
-                value={user.evening}
-                onChange={handleChange}
-                name="evening"
-                type="number"
-                label="Evening"
+                label="Total"
                 variant="outlined"
                 fullWidth
-                disabled={isEveningDisabled}
+                name="cowTotal"
+                value={user.cowTotal}
+                disabled
               />
-            </Grid> 
+            </Grid>
 
             <Grid item xs={12}>
               <Button
@@ -259,13 +268,15 @@ const AddMilkInward = () => {
                 color="primary"
                 fullWidth
                 onClick={handleSubmit}
+                disabled={loading}
               >
-                Submit
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Submit"}
               </Button>
             </Grid>
           </Grid>
         </form>
       </Paper>
+      <ToastContainer/>
     </>
   );
 };
