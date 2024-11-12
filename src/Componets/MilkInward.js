@@ -29,7 +29,7 @@ export default function MilkInward() {
   const [milkType, setMilkType] = useState("All");
   async function getData() {
     try {
-      const response = await axios.get("http://mymilkapp.glitch.me/milkInward");
+      const response = await axios.get("https://mymilkapp.glitch.me/milkInward");
       const milkInwardData = response.data.map((item, index) => ({
         id: index + 1,
         ...item,
