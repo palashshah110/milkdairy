@@ -69,7 +69,7 @@ const AddMilkOutward = () => {
     };
 
     try {
-      await axios.post("https://mymilkapp.glitch.me/milkOutward", data);
+      await axios.post("http://mymilkapp.glitch.me/milkOutward", data);
       toast.success("Outward Added Successfully");
       setUser({
         dates: new Date().toISOString().split("T")[0],
