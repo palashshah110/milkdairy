@@ -13,6 +13,7 @@ export default function App() {
   return (
     <div className="App">
       <Box sx={{ display: "flex" }}>
+      <div id="recaptcha-container"></div>
         <BrowserRouter>
           <Routes>
             <Route exact path="/" element={<Login />} />
